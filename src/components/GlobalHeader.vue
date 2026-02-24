@@ -8,11 +8,12 @@
         </router-link>
       </a-col>
       <a-col flex="auto">
-        <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items" />
+        <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items" @click="handleMenuClick"/>
       </a-col>
       <a-col flex="100px">
         <div class="user-login-status">
-          <a-button type="primary" style="margin-left: 16px">登录</a-button>
+          <div v-if="loginUserStore.loginUser.id">{{ loginUserStore.loginUser.userName??'无名' }}</div>
+          <div v-else><a-button type="primary" style="margin-left: 16px">登录</a-button></div>
         </div>
       </a-col>
     </a-row>
@@ -23,7 +24,12 @@
 import { h, ref } from 'vue'
 import { HomeOutlined } from '@ant-design/icons-vue'
 import type { MenuProps } from 'ant-design-vue'
-import type router from '@/router'
+import { useRouter } from 'vue-router'  
+import { useLoginUserStore } from '../stores/useLoginUserStore.ts'
+
+const loginUserStore = useLoginUserStore()
+const router = useRouter()  
+// 当前选中的菜单项
 const current = ref<string[]>(['mail'])
 const items = ref<MenuProps['items']>([
   {
@@ -43,6 +49,15 @@ const items = ref<MenuProps['items']>([
     title: '百度',
   },
 ])
+const handleMenuClick = ({key}) => {
+  router.push({
+    path:key
+  })
+}
+// 监听路由变化，更新当前选中的菜单项
+router.afterEach((to,from,next)=>{
+  current.value=[to.path]
+})
 </script>
 
 <style scoped>
@@ -59,4 +74,4 @@ const items = ref<MenuProps['items']>([
   margin-left: 16px;
 }
 </style>
->
+
